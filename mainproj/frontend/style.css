@@ -89,6 +89,22 @@ input:focus, textarea:focus {
     background: linear-gradient(90deg, #0ea5e9, #c026d3);
 }
 
+/* NEW: Glassmorphism effect */
+.glassmorphism {
+    background: rgba(26, 32, 44, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* NEW: Gradient text */
+.gradient-text {
+    background: linear-gradient(90deg, #0ea5e9, #c026d3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 
 /* --- ANIMATION CLASSES (Unchanged) --- */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

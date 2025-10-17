@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCTIONS ---
 
+    const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+
     const showMessage = (msg, isError = false) => {
         messageText.textContent = msg;
         messageBox.classList.remove('hidden', 'bg-green-500', 'bg-red-500');
@@ -23,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 userAccount = accounts[0];
+                localStorage.setItem('userAccount', userAccount);
                 const shortAddress = `${userAccount.substring(0, 6)}...${userAccount.substring(userAccount.length - 4)}`;
                 connectWalletBtn.textContent = shortAddress;
                 connectWalletBtn.disabled = true;
@@ -51,10 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
                 <!-- Left Column: Image and Stats -->
                 <div class="lg:col-span-2">
-                    <img src="${campaign.image}" alt="${campaign.title}" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg mb-8">
-                    <h2 class="text-4xl font-black text-white mb-2">${campaign.title}</h2>
-                    <p class="text-gray-400 mb-6">Created by: <span class="font-mono text-indigo-400">${campaign.owner}</span></p>
-                    <p class="text-lg text-gray-300 leading-relaxed">${campaign.description}</p>
+                    <img src="${escapeHtml(campaign.image)}" alt="${escapeHtml(campaign.title)}" class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg mb-8">
+                    <h2 class="text-4xl font-black text-white mb-2">${escapeHtml(campaign.title)}</h2>
+                    <p class="text-gray-400 mb-6">Created by: <span class="font-mono text-indigo-400">${escapeHtml(campaign.owner)}</span></p>
+                    <p class="text-lg text-gray-300 leading-relaxed">${escapeHtml(campaign.description)}</p>
                 </div>
 
                 <!-- Right Column: Funding and Donators -->
@@ -109,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const item = document.createElement('div');
                 item.className = 'glassmorphism p-4 rounded-lg flex justify-between items-center';
                 item.innerHTML = `
-                    <p class="font-mono text-sm text-gray-300">${donator.address}</p>
+                    <p class="font-mono text-sm text-gray-300">${escapeHtml(donator.address)}</p>
                     <p class="font-bold text-indigo-400">${donator.amount} ETH</p>
                 `;
                 donatorsList.appendChild(item);
@@ -178,6 +185,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const campaign = campaigns.find(c => c.id === campaignId);
         renderCampaignDetails(campaign);
+
+        // Load saved userAccount from localStorage
+        const savedAccount = localStorage.getItem('userAccount');
+        if (savedAccount) {
+            userAccount = savedAccount;
+            const shortAddress = `${userAccount.substring(0, 6)}...${userAccount.substring(userAccount.length - 4)}`;
+            connectWalletBtn.textContent = shortAddress;
+            connectWalletBtn.disabled = true;
+            document.getElementById('profileLink').classList.remove('hidden');
+        }
     };
 
     connectWalletBtn.addEventListener('click', connectWallet);

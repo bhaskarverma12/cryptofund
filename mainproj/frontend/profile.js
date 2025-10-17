@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCTIONS ---
 
+    const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+
     const showMessage = (msg, isError = false) => {
         messageText.textContent = msg;
         messageBox.classList.remove('hidden');
@@ -41,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         profileContainer.innerHTML = `
             <div class="mb-12">
                 <h2 class="text-3xl font-bold text-white mb-2">My Wallet</h2>
-                <p class="font-mono text-indigo-400 bg-gray-800 p-3 rounded-lg">${userAccount}</p>
+                <p class="font-mono text-indigo-400 bg-gray-800 p-3 rounded-lg">${escapeHtml(userAccount)}</p>
             </div>
 
             <!-- Created Campaigns Section -->
@@ -87,9 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const progress = Math.min(100, (campaign.amountCollected / campaign.target) * 100);
         return `
             <a href="campaign-details.html?id=${campaign.id}" class="glassmorphism rounded-2xl overflow-hidden shadow-lg transform hover:-translate-y-2 transition-transform duration-300 flex flex-col">
-                <img class="w-full h-40 object-cover" src="${campaign.image}" alt="${campaign.title}">
+                <img class="w-full h-40 object-cover" src="${escapeHtml(campaign.image)}" alt="${escapeHtml(campaign.title)}">
                 <div class="p-4 flex flex-col flex-grow">
-                    <h4 class="font-bold text-lg mb-2 text-white">${campaign.title}</h4>
+                    <h4 class="font-bold text-lg mb-2 text-white">${escapeHtml(campaign.title)}</h4>
                     <div class="w-full bg-gray-700 rounded-full h-2 mt-auto mb-2">
                         <div class="bg-gradient-to-r from-indigo-500 to-pink-500 h-2 rounded-full" style="width: ${progress}%"></div>
                     </div>
@@ -101,13 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
      const createBackedCampaignItem = (campaign) => {
         const myDonation = campaign.donators.find(d => d.address.toLowerCase() === userAccount.toLowerCase());
+        const donationAmount = myDonation ? myDonation.amount : 0;
         return `
             <a href="campaign-details.html?id=${campaign.id}" class="glassmorphism p-4 rounded-lg flex justify-between items-center hover:bg-gray-800 transition-colors duration-300">
                 <div>
-                    <p class="font-bold text-white">${campaign.title}</p>
-                    <p class="text-sm text-gray-500">by ${campaign.owner.substring(0,12)}...</p>
+                    <p class="font-bold text-white">${escapeHtml(campaign.title)}</p>
+                    <p class="text-sm text-gray-500">by ${escapeHtml(campaign.owner.substring(0,12))}...</p>
                 </div>
-                <p class="font-bold text-green-400">You backed ${myDonation.amount} ETH</p>
+                <p class="font-bold text-green-400">You backed ${donationAmount} ETH</p>
             </a>
         `;
     };
