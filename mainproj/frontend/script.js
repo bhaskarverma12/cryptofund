@@ -73,6 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { threshold: 0.1 });
 
     // --- FUNCTIONS (RESTORED) ---
+    const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+
     const connectWallet = async () => {
         if (window.ethereum) {
             try {
@@ -109,15 +115,38 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         if (!userAccount) { showMessage('Please connect your wallet first.', true); return; }
         const formData = new FormData(createCampaignForm);
+        
+        // Validate input
+        const title = formData.get('title')?.trim();
+        const description = formData.get('description')?.trim();
+        const goal = parseFloat(formData.get('goal'));
+        const deadlineStr = formData.get('deadline');
+        
+        if (!title || !description) {
+            showMessage('Title and description are required.', true);
+            return;
+        }
+        
+        if (isNaN(goal) || goal <= 0) {
+            showMessage('Please enter a valid funding goal.', true);
+            return;
+        }
+        
+        const deadline = new Date(deadlineStr).getTime();
+        if (isNaN(deadline) || deadline <= Date.now()) {
+            showMessage('Please select a future deadline.', true);
+            return;
+        }
+        
         const newCampaign = {
             id: campaigns.length,
             owner: userAccount,
-            title: formData.get('title'),
-            description: formData.get('description'),
-            target: parseFloat(formData.get('goal')),
-            deadline: new Date(formData.get('deadline')).getTime(),
+            title: title,
+            description: description,
+            target: goal,
+            deadline: deadline,
             amountCollected: 0,
-            image: `https://placehold.co/600x400/1a202c/ffffff?text=${formData.get('title').replace(/\s/g, '+')}`,
+            image: `https://placehold.co/600x400/1a202c/ffffff?text=${encodeURIComponent(title)}`,
             donators: []
         };
         campaigns.unshift(newCampaign);
@@ -138,10 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
             cardWrapper.dataset.delay = (index % 3) * 150;
             cardWrapper.innerHTML = `
                 <a href="campaign-details.html?id=${campaign.id}" class="card p-4 flex flex-col h-full">
-                    <img class="w-full h-40 object-cover rounded-md mb-4" src="${campaign.image}" alt="${campaign.title}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/030913/ffffff?text=Image+Error';">
+                    <img class="w-full h-40 object-cover rounded-md mb-4" src="${escapeHtml(campaign.image)}" alt="${escapeHtml(campaign.title)}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/030913/ffffff?text=Image+Error';">
                     <div class="flex flex-col flex-grow">
-                        <h4 class="font-bold text-lg mb-2 text-white">${campaign.title}</h4>
-                        <p class="text-gray-400 text-sm mb-4 flex-grow">${campaign.description.substring(0, 80)}...</p>
+                        <h4 class="font-bold text-lg mb-2 text-white">${escapeHtml(campaign.title)}</h4>
+                        <p class="text-gray-400 text-sm mb-4 flex-grow">${escapeHtml(campaign.description.substring(0, 80))}...</p>
                         <div class="w-full bg-gray-700 rounded-full h-2 mb-2">
                             <div class="progress-gradient h-2 rounded-full" style="width: ${progress}%"></div>
                         </div>
