@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 userAccount = accounts[0];
+                localStorage.setItem('userAccount', userAccount);
                 const shortAddress = `${userAccount.substring(0, 6)}...${userAccount.substring(userAccount.length - 4)}`;
                 connectWalletBtn.textContent = shortAddress;
                 connectWalletBtn.disabled = true;
@@ -178,6 +179,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const campaign = campaigns.find(c => c.id === campaignId);
         renderCampaignDetails(campaign);
+
+        // Load saved userAccount from localStorage
+        const savedAccount = localStorage.getItem('userAccount');
+        if (savedAccount) {
+            userAccount = savedAccount;
+            const shortAddress = `${userAccount.substring(0, 6)}...${userAccount.substring(userAccount.length - 4)}`;
+            connectWalletBtn.textContent = shortAddress;
+            connectWalletBtn.disabled = true;
+            document.getElementById('profileLink').classList.remove('hidden');
+        }
     };
 
     connectWalletBtn.addEventListener('click', connectWallet);

@@ -101,13 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
      const createBackedCampaignItem = (campaign) => {
         const myDonation = campaign.donators.find(d => d.address.toLowerCase() === userAccount.toLowerCase());
+        const donationAmount = myDonation ? myDonation.amount : 0;
         return `
             <a href="campaign-details.html?id=${campaign.id}" class="glassmorphism p-4 rounded-lg flex justify-between items-center hover:bg-gray-800 transition-colors duration-300">
                 <div>
                     <p class="font-bold text-white">${campaign.title}</p>
                     <p class="text-sm text-gray-500">by ${campaign.owner.substring(0,12)}...</p>
                 </div>
-                <p class="font-bold text-green-400">You backed ${myDonation.amount} ETH</p>
+                <p class="font-bold text-green-400">You backed ${donationAmount} ETH</p>
             </a>
         `;
     };
